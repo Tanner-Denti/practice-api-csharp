@@ -6,7 +6,6 @@ using sample_api.Services;
 namespace sample_api.Controllers;
 
 // TODO: 
-// IMemoryCache()
 // Auth & Authz
 // Bicep - Infrastructure as code to create resources
 // Attempt an Azure deployment
