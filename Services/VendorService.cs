@@ -46,6 +46,8 @@ public class VendorService : IVendorService
         return vendorDto;
     }
 
+    // TODO:
+    // Update the cache when an entity is updated
     public async Task<VendorDto> UpdateVendorAsync(string vendorName, VendorDto vendorDto)
     {
         return await _vendorRepository.UpdateVendorAsync(vendorName, vendorDto);
