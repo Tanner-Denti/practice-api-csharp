@@ -30,17 +30,4 @@ public class VendorMapper : IVendorMapper
             PostalCode = vendorDto.PostalCode
         };
     }
-
-    public VendorDto VendorDtoToVendorDto(VendorDto vendorDto)
-    {
-        return new VendorDto
-        {
-            Name = vendorDto.Name,
-            PhoneNumber = vendorDto.PhoneNumber,
-            Street = vendorDto.Street,
-            City = vendorDto.City,
-            State = vendorDto.State,
-            PostalCode = vendorDto.PostalCode
-        };
-    }
 }
