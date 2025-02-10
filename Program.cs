@@ -12,6 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Caching
+builder.Services.AddMemoryCache();
+
 // Vendor
 builder.Services.AddScoped<IVendorMapper, VendorMapper>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();

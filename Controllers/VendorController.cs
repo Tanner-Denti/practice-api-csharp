@@ -5,13 +5,15 @@ using sample_api.Services;
 
 namespace sample_api.Controllers;
 
-// TODO:
-// Pagination
+// TODO: 
+// IMemoryCache()
 // Auth & Authz
-// Telemetry
+// Bicep - Infrastructure as code to create resources
+// Attempt an Azure deployment
+// Azure devops
 
 [ApiController]
-[Route("[controller]")]
+[Route("vendors")]
 public class VendorController : ControllerBase
 {
     private readonly IVendorService _vendorService;
@@ -21,6 +23,8 @@ public class VendorController : ControllerBase
         _vendorService = vendorService;
     }
 
+    // TODO:
+    // Could use CreatedAtAction for maintainability here.
     [HttpPost]
     public async Task<IActionResult> CreateVendorAsync([FromBody] VendorDto vendorDto)
     {
@@ -28,7 +32,7 @@ public class VendorController : ControllerBase
         {
             bool isCreated = await _vendorService.CreateVendorAsync(vendorDto);
             return isCreated 
-                ? Created($"Vendor/{vendorDto.Name}", vendorDto)
+                ? Created($"vendors/{vendorDto.Name}", vendorDto) 
                 : Conflict($"Vendor with name: {vendorDto.Name} - already exists");
         }
         catch (Exception)
@@ -38,11 +42,13 @@ public class VendorController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<VendorDto>>> GetVendorsAsync()
+    public async Task<ActionResult<IReadOnlyCollection<VendorDto>>> GetVendorsAsync(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
         try
         {
-            IReadOnlyCollection<VendorDto> vendors = await _vendorService.GetAllVendorsAsync();
+            IReadOnlyCollection<VendorDto> vendors = await _vendorService.GetAllVendorsAsync(page, pageSize);
             return Ok(vendors);
         }
         catch (Exception)  // Update catch clause with appropriate error/responses
@@ -51,7 +57,7 @@ public class VendorController : ControllerBase
         }
     }
     
-    [HttpGet("{vendorName}", Name = "GetVendorByName")]
+    [HttpGet("{vendorName}")]
     public async Task<ActionResult<VendorDto>> GetVendorByNameAsync(string vendorName)
     {
         try
@@ -62,6 +68,41 @@ public class VendorController : ControllerBase
         catch (EntityNotFoundException)
         {
             return NotFound();
+        }
+        catch (Exception)
+        {
+            return StatusCode(500);
+        }
+    }
+
+    [HttpPut("{vendorName}")]
+    public async Task<ActionResult<VendorDto>> UpdateVendorByNameAsync(string vendorName, VendorDto vendorDto)
+    {
+        try
+        {
+            if (vendorName != vendorDto.Name)
+                return BadRequest($"{vendorName} in URL does not match {vendorDto.Name} in body.");
+
+            VendorDto responseDto = await _vendorService.UpdateVendorAsync(vendorName, vendorDto);
+            return Ok(responseDto);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500);
+        }
+    }
+    
+    [HttpDelete("{vendorName}")]
+    public async Task<IActionResult> DeleteVendorByNameAsync(string vendorName)
+    {
+        try
+        {
+            await _vendorService.DeleteVendorByNameAsync(vendorName);
+            return NoContent();
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound($"{vendorName} not found.");
         }
         catch (Exception)
         {
